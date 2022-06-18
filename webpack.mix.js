@@ -11,7 +11,24 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
-    .postCss('resources/css/app.css', 'public/css', [
-        //
-    ]);
+ function findFiles(dir) {
+    const fs = require('fs');
+    return fs.readdirSync(dir).filter( file => {
+        return fs.statSync(`${dir}/${file}`).isFile();
+    });
+ }
+
+ function buildSass(dir, dest) {
+    // Find all files in dir, compile sass and place them in dest
+    findFiles(dir).forEach(function(file) {
+        if(!file.startsWith('_')) {
+            mix.sass(dir + '/' + file, dest);
+        }
+    })
+    
+ }
+
+
+
+mix.js('resources/js/app.js', 'public/js');
+buildSass('resources/scss', 'public/css');
